@@ -75,7 +75,7 @@
 
         function countFill(productNum, st) {
             let ratingSpan = document.getElementById(`rating${productNum}`);
-            productRatings.push({ productNum, rating: 0, user: 0 ,countSum:0});
+            productRatings.push({ productNum, rating: 0, user: 0 ,ratingSum:0});
 
             for (let i = 1; i <= 5; i++) {
                 let star = document.getElementById(`s${productNum}_${i}`);
@@ -87,12 +87,12 @@
             }
             productRatings[productNum - 1].rating = st;
             ratingSpan.innerHTML = st;
-            productRatings[productNum-1].ratingSum+=productRatings[productNum-1].rating;
-            
+
         }
 
         function userCount(productNum) {
             productRatings[productNum - 1].user++;
+            productRatings[productNum-1].ratingSum+=productRatings[productNum-1].rating;
             let avgRating=productRatings[productNum-1].ratingSum/productRatings[productNum - 1].user;
             document.getElementById(`userCount${productNum}`).innerHTML = productRatings[productNum - 1].user;
             document.getElementById(`avgRating${productNum}`).innerHTML = avgRating;

@@ -63,6 +63,7 @@
                         </p>
                         <p class="card-text">Rating: <span id="rating${i}">0</span></p>
                         <p class="card-text">User Count: <span id="userCount${i}">0</span></p>
+                        <p class="card-text">Avg Rating: <span id="avgRating${i}">0</span></p>
                         <a href="#" class="btn btn-primary" onclick="userCount(${i});">Submit</a>
                     </div>
                 </div>`;
@@ -74,7 +75,7 @@
 
         function countFill(productNum, st) {
             let ratingSpan = document.getElementById(`rating${productNum}`);
-            productRatings.push({ productNum, rating: 0, user: 0 });
+            productRatings.push({ productNum, rating: 0, user: 0 ,countSum:0});
 
             for (let i = 1; i <= 5; i++) {
                 let star = document.getElementById(`s${productNum}_${i}`);
@@ -86,12 +87,15 @@
             }
             productRatings[productNum - 1].rating = st;
             ratingSpan.innerHTML = st;
+            productRatings[productNum-1].ratingSum+=productRatings[productNum-1].rating;
             
         }
 
         function userCount(productNum) {
             productRatings[productNum - 1].user++;
+            let avgRating=productRatings[productNum-1].ratingSum/productRatings[productNum - 1].user;
             document.getElementById(`userCount${productNum}`).innerHTML = productRatings[productNum - 1].user;
+            document.getElementById(`avgRating${productNum}`).innerHTML = avgRating;
         }
 
         function merge(arr, left, mid, right) {

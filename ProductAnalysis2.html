@@ -29,27 +29,30 @@
 
     </div>
     <div class="container text-center mx-3 my-4">
-      <p>
-        <a href="#" class="btn btn-primary" onclick="sortProducts();">Sort</a>
-      </p>
+        <p>
+            <a href="#" class="btn btn-primary" onclick="sortProducts();">Sort</a>
+        </p>
     </div>
-
+    
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             rateProduct(document.getElementById("myForm"));
         });
-
+        
         var productRatings = [];
-
+        for(let i=1;i<=5;i++){
+         productRatings.push({ productNum:i, rating: 0, user: 0 ,ratingSum:0 , avgRating:0});
+        }
         function rateProduct(form) {
             let product = "";
             let color = ["warning", "danger", "info", "secondary", "primary"];
 
             for (let i = 1; i <= 5; i++) {
-                let bg = color[i - 1];
+                let k = productRatings[i-1].productNum;
+                let bg = color[k - 1];
                 product += `
                 <div class="card me-4" style="width: 19rem;">
-                    <div class="bg bg-${bg} h3 text-white text-center p-5">Product ${i}</div>
+                    <div class="bg bg-${bg} h3 text-white text-center p-5">Product ${k}</div>
                     <div class="card-body">
                         <h5 class="card-title">User Ratings</h5>
                         <p class="card-text">
@@ -61,10 +64,10 @@
                                 <span class="star" id="s${i}_5" onclick="countFill(${i}, 5);">&#9733;</span>
                             </div>
                         </p>
-                        <p class="card-text">Rating: <span id="rating${i}">0</span></p>
-                        <p class="card-text">User Count: <span id="userCount${i}">0</span></p>
-                        <p class="card-text">Avg Rating: <span id="avgRating${i}">0</span></p>
-                        <a href="#" class="btn btn-primary" onclick="userCount(${i});">Submit</a>
+                        <p class="card-text">Rating: <span id="rating${k}">0</span></p>
+                        <p class="card-text">User Count: <span id="userCount${k}">0</span></p>
+                        <p class="card-text">Avg Rating: <span id="avgRating${k}">0</span></p>
+                        <a href="#" class="btn btn-primary" onclick="userCount(${k});">Submit</a>
                     </div>
                 </div>`;
             }
@@ -75,7 +78,6 @@
 
         function countFill(productNum, st) {
             let ratingSpan = document.getElementById(`rating${productNum}`);
-            productRatings.push({ productNum, rating: 0, user: 0 ,ratingSum:0});
 
             for (let i = 1; i <= 5; i++) {
                 let star = document.getElementById(`s${productNum}_${i}`);
@@ -85,18 +87,25 @@
                     star.style.color = "black";
                 }
             }
-            productRatings[productNum - 1].rating = st;
+            for(let product=1;product<=5;product++){
+            if(productNum==productRatings[product-1].productNum)
+               productRatings[product - 1].rating = st;
+            }
             ratingSpan.innerHTML = st;
 
         }
 
-        function userCount(productNum) {
+        function userCount(product) {
+
+            for(let productNum=1;productNum<=5;productNum++){
+            if(product==productRatings[productNum-1].productNum){
             productRatings[productNum - 1].user++;
-            productRatings[productNum-1].ratingSum+=productRatings[productNum-1].rating;
-            let avgRating=productRatings[productNum-1].ratingSum/productRatings[productNum - 1].user;
-            document.getElementById(`userCount${productNum}`).innerHTML = productRatings[productNum - 1].user;
-            document.getElementById(`avgRating${productNum}`).innerHTML = avgRating;
-        }
+            productRatings[productNum - 1].ratingSum+=productRatings[productNum-1].rating;
+            productRatings[productNum - 1].avgRating=productRatings[productNum-1].ratingSum/productRatings[productNum - 1].user;
+            document.getElementById(`userCount${product}`).innerHTML = productRatings[productNum - 1].user;
+            document.getElementById(`avgRating${product}`).innerHTML = productRatings[productNum -1].avgRating;
+        }}
+    }
 
         function merge(arr, left, mid, right) {
             let n1 = mid - left + 1;
@@ -150,14 +159,15 @@
         }
 
         function sortProducts() {
-            mergeSort(productRatings, 0, productRatings.length - 1);
+            mergeSort(productRatings, 0, productRatings.length-1);
+            console.log(productRatings.length);
 
             let sortedProductHTML = "";
-            for (let i = 0; i < productRatings.length; i++) {
-                let sortedProductNumber = productRatings[i].productNum;
+            for (let i = 1; i <=5; i++) {
+                let sortedProductNumber = productRatings[i-1].productNum;
                 sortedProductHTML += document.getElementById(`rating${sortedProductNumber}`).parentNode.parentNode.parentNode.outerHTML;
             }
-
+            console.log(productRatings);
             document.getElementById("rateProduct").innerHTML = sortedProductHTML;
         }
     </script>

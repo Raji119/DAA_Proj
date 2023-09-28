@@ -16,18 +16,16 @@
 </head>
 
 <body class="container-fluid">
+
     <h2 class="text-center">Product Rating Analyzer</h2>
 
-    <div class="d-flex flex-wrap">
+    <div class="d-flex flex-wrap" id="rateProduct">
         <form id="myForm">
 
         </form>
     </div>
 
-    <div class="d-flex no-wrap" id="rateProduct">
-
-
-    </div>
+   
     <div class="container text-center mx-3 my-4">
         <p>
             <a href="#" class="btn btn-primary" onclick="sortProducts();">Sort</a>
@@ -35,9 +33,6 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            rateProduct(document.getElementById("myForm"));
-        });
 
         var productRatings = [];
 
@@ -45,13 +40,18 @@
             productRatings.push({ productNum: i, rating: 0, user: 0, ratingSum: 0, avgRating: 0 });
         }
         
+        document.addEventListener("DOMContentLoaded", function () {
+            rateProduct(document.getElementById("myForm"));
+        });
+
         function rateProduct(form) {
+
             let product = "";
-            let color = ["warning", "danger", "info", "secondary", "primary"];
+            let color   = ["warning", "danger", "info", "secondary", "primary"];
             let k,bg;
 
             for (let i = 1; i <= 5; i++) {
-                k = productRatings[i - 1].productNum;
+                k  = productRatings[i - 1].productNum;
                 bg = color[k - 1];
                 product += `
                 <div class="card me-4" style="width: 19rem;">
@@ -80,8 +80,7 @@
         }
 
         function countFill(product, st) {
-            let ratingSpan = document.getElementById(`rating${product}`);
-
+            
             for (let i = 1; i <= 5; i++) {
                 let star = document.getElementById(`s${product}_${i}`);
                 if (i <= st) {
@@ -90,12 +89,15 @@
                     star.style.color = "black";
                 }
             }
+            
+            let ratingSpan = document.getElementById(`rating${product}`);
+            ratingSpan.innerHTML = st;
 
             for (let productNum = 1; productNum <= 5; productNum++) {
                 if (product == productRatings[productNum - 1].productNum)
-                    productRatings[productNum - 1].rating = st;
-            }
-            ratingSpan.innerHTML = st;
+                productRatings[productNum - 1].rating = st;
+             }
+        
 
         }
 
@@ -165,7 +167,7 @@
 
         function sortProducts() {
             mergeSort(productRatings, 0, productRatings.length - 1);
-            console.log(productRatings.length);
+           // console.log(productRatings.length);
 
             let sortedProductHTML = "";
             for (let i = 1; i <= 5; i++) {

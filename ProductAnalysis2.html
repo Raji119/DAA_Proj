@@ -33,23 +33,26 @@
             <a href="#" class="btn btn-primary" onclick="sortProducts();">Sort</a>
         </p>
     </div>
-    
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             rateProduct(document.getElementById("myForm"));
         });
-        
+
         var productRatings = [];
-        for(let i=1;i<=5;i++){
-         productRatings.push({ productNum:i, rating: 0, user: 0 ,ratingSum:0 , avgRating:0});
+
+        for (let i = 1; i <= 5; i++) {
+            productRatings.push({ productNum: i, rating: 0, user: 0, ratingSum: 0, avgRating: 0 });
         }
+        
         function rateProduct(form) {
             let product = "";
             let color = ["warning", "danger", "info", "secondary", "primary"];
+            let k,bg;
 
             for (let i = 1; i <= 5; i++) {
-                let k = productRatings[i-1].productNum;
-                let bg = color[k - 1];
+                k = productRatings[i - 1].productNum;
+                bg = color[k - 1];
                 product += `
                 <div class="card me-4" style="width: 19rem;">
                     <div class="bg bg-${bg} h3 text-white text-center p-5">Product ${k}</div>
@@ -76,20 +79,21 @@
             document.getElementById("rateProduct").innerHTML = product;
         }
 
-        function countFill(productNum, st) {
-            let ratingSpan = document.getElementById(`rating${productNum}`);
+        function countFill(product, st) {
+            let ratingSpan = document.getElementById(`rating${product}`);
 
             for (let i = 1; i <= 5; i++) {
-                let star = document.getElementById(`s${productNum}_${i}`);
+                let star = document.getElementById(`s${product}_${i}`);
                 if (i <= st) {
                     star.style.color = "red";
                 } else {
                     star.style.color = "black";
                 }
             }
-            for(let product=1;product<=5;product++){
-            if(productNum==productRatings[product-1].productNum)
-               productRatings[product - 1].rating = st;
+
+            for (let productNum = 1; productNum <= 5; productNum++) {
+                if (product == productRatings[productNum - 1].productNum)
+                    productRatings[productNum - 1].rating = st;
             }
             ratingSpan.innerHTML = st;
 
@@ -97,15 +101,16 @@
 
         function userCount(product) {
 
-            for(let productNum=1;productNum<=5;productNum++){
-            if(product==productRatings[productNum-1].productNum){
-            productRatings[productNum - 1].user++;
-            productRatings[productNum - 1].ratingSum+=productRatings[productNum-1].rating;
-            productRatings[productNum - 1].avgRating=productRatings[productNum-1].ratingSum/productRatings[productNum - 1].user;
-            document.getElementById(`userCount${product}`).innerHTML = productRatings[productNum - 1].user;
-            document.getElementById(`avgRating${product}`).innerHTML = productRatings[productNum -1].avgRating;
-        }}
-    }
+            for (let productNum = 1; productNum <= 5; productNum++) {
+                if (product == productRatings[productNum - 1].productNum) {
+                    productRatings[productNum - 1].user++;
+                    productRatings[productNum - 1].ratingSum += productRatings[productNum - 1].rating;
+                    productRatings[productNum - 1].avgRating = productRatings[productNum - 1].ratingSum / productRatings[productNum - 1].user;
+                    document.getElementById(`userCount${product}`).innerHTML = productRatings[productNum - 1].user;
+                    document.getElementById(`avgRating${product}`).innerHTML = productRatings[productNum - 1].avgRating;
+                }
+            }
+        }
 
         function merge(arr, left, mid, right) {
             let n1 = mid - left + 1;
@@ -159,12 +164,12 @@
         }
 
         function sortProducts() {
-            mergeSort(productRatings, 0, productRatings.length-1);
+            mergeSort(productRatings, 0, productRatings.length - 1);
             console.log(productRatings.length);
 
             let sortedProductHTML = "";
-            for (let i = 1; i <=5; i++) {
-                let sortedProductNumber = productRatings[i-1].productNum;
+            for (let i = 1; i <= 5; i++) {
+                let sortedProductNumber = productRatings[i - 1].productNum;
                 sortedProductHTML += document.getElementById(`rating${sortedProductNumber}`).parentNode.parentNode.parentNode.outerHTML;
             }
             console.log(productRatings);

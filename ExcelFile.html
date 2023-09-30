@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Excel Data Display(EF)</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha512-r22gChDnGvBylk90+2e/ycr3RVrDi8DIOkIGNhJlKfuyQM4tIRAI062MaV8sfjQKYVGjOBaZBOA87z+IhZE9DA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</head>
+<body>
+    <div id="excelData"></div>
+
+    <script>
+        // URL to the Excel file
+        const excelFileURL = 'excel.xlsx';
+
+        // Function to load and display Excel data
+        function loadAndDisplayExcelData() {
+            fetch(excelFileURL)
+                .then(response => response.blob())
+                .then(blob => {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        const data = e.target.result;
+                        const workbook = XLSX.read(data, { type: 'binary' });
+
+                        // Assuming the first sheet is the one you want to display
+                        const sheetName = workbook.SheetNames[0];
+                        const sheet = workbook.Sheets[sheetName];
+
+                        // Convert the sheet data to JSON
+                        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                        console.log(jsonData);
+
+                        let ratingAll=[];
+
+                        // Display the Excel data on the webpage
+                        const excelDataDiv = document.getElementById('excelData');
+                        excelDataDiv.innerHTML = '<table>';
+                        for (let i = 0; i < jsonData.length; i++) {
+                            excelDataDiv.innerHTML += '<tr>';
+                            for (let j = 0; j < jsonData[i].length; j++) {
+                                excelDataDiv.innerHTML += '<td>' + jsonData[i][j] + '</td>';
+                                ratingAll.push(jsonData[i][j]);
+                            }
+                            excelDataDiv.innerHTML += '</tr>';
+                        }
+                        excelDataDiv.innerHTML += '</table>';
+                        sortRating(ratingAll);
+                    };
+
+
+                    reader.readAsBinaryString(blob);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function sortRating(ratingAll){
+            let i,j,l=1,u=5,n=ratingAll.length,D=[],S=[];
+
+            //Initialize Frequencies
+            for(i=0;i<u-l+1;i++)
+                D[i]=0;
+
+            console.log(D);
+
+            //Compute Frequencies
+            for(i=0;i<n;i++)
+                D[ratingAll[i]-l]=D[ratingAll[i]-l]+1;
+
+
+            //Reuse For Distribution
+            for(j=1;j<u-l+1;j++)
+                D[j]=D[j-1]+D[j];
+
+
+            for(i=n-1;i>=0;i--){
+                j=ratingAll[i]-l
+                S[D[j]-1]=ratingAll[i];
+                D[j]=D[j]-1;
+            }
+
+            console.log(S);
+
+        }
+
+        // Call the function to load and display Excel data
+        loadAndDisplayExcelData();
+    </script>
+</body>
+</html>

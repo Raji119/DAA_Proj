@@ -7,14 +7,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
         integrity="sha512-r22gChDnGvBylk90+2e/ycr3RVrDi8DIOkIGNhJlKfuyQM4tIRAI062MaV8sfjQKYVGjOBaZBOA87z+IhZE9DA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <style>
+        h1{
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
+    <h1>Product Rating Analyzer</h1>
     <div id="excelData"></div>
-    <h1>Simple Bar Graph</h1>
+    <h2>Simple Bar Graph</h2>
     <svg></svg>
- 
+    <div id="sortedData"></div>
 
     <script>
         // URL to the Excel file
@@ -33,27 +38,25 @@
 
                         // Assuming the first sheet is the one you want to display
                         const sheetName = workbook.SheetNames[0];
+                        
                         const sheet = workbook.Sheets[sheetName];
-
+                        
                         // Convert the sheet data to JSON
                         const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-                        console.log(jsonData);
 
                         let ratingAll = [];
 
                         // Display the Excel data on the webpage
                         const excelDataDiv = document.getElementById('excelData');
-                        excelDataDiv.innerHTML = '<table>';
+                        excelDataDiv.innerHTML = '<table><tr><td><h3>Before Sorting<h3></td></tr>';
                         for (let i = 0; i < jsonData.length; i++) {
-                         //   excelDataDiv.innerHTML += '<tr>';
                             for (let j = 0; j < jsonData[i].length; j++) {
                                 excelDataDiv.innerHTML += '<tr> <td>' + jsonData[i][j] + '</td> </tr>';
                                 ratingAll.push(jsonData[i][j]);
                             }
-                           // excelDataDiv.innerHTML += '</tr>';
                         }
                         excelDataDiv.innerHTML += '</table>';
+
                         sortRating(ratingAll);
                     };
 
@@ -78,6 +81,14 @@
             barGraph(D);
 
 
+            for(i=0;i<n;i++){
+                if(D[i]==0){
+                    alert("Distribution Sorting cannot be done");
+                    return;
+                }
+            }
+
+
             //Reuse For Distribution
             for (j = 1; j < u - l + 1; j++)
                 D[j] = D[j - 1] + D[j];
@@ -91,6 +102,12 @@
 
             console.log(S);
 
+            const sortedData = document.getElementById('sortedData');
+                        sortedData.innerHTML = '<table><tr><td><h3>After Sorting<h3></td></tr>';
+                        for (let i = 0; i < S.length; i++) {
+                                sortedData.innerHTML += '<tr> <td>' + S[i] + '</td> </tr>';
+                        }
+                        sortedData.innerHTML += '</table>';
         }
 
         function barGraph(d) {

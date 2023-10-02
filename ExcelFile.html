@@ -3,6 +3,11 @@
 
 <head>
     <title>Excel Data Display(EF)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
     <script src ="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
         integrity="sha512-r22gChDnGvBylk90+2e/ycr3RVrDi8DIOkIGNhJlKfuyQM4tIRAI062MaV8sfjQKYVGjOBaZBOA87z+IhZE9DA=="
@@ -11,17 +16,54 @@
         h1{
             text-align: center;
         }
+
+        body {
+            background-color: #ccffff;
+        }
+        /* #excelData{
+            background-color: rgb(221, 106, 49);
+        } */
+        #excelData,#sortedData{
+            background-color: rgb(82, 236, 184);
+            color: white;
+        }
+        #frequencyData,#cfrequencyData{
+            background-color: rgb(29, 251, 251);
+        }
+        #head{
+            background-color: rgb(145, 243, 243);
+        }
     </style>
 </head>
 
-<body>
-    <h1>Product Rating Analyzer</h1>
-    <div id="excelData"></div>
+<body >
+    <div class="container">
+    <div class=" border-white">
+    <h1 class="text-dark" id="head">Product Rating Analyzer</h1>
+    </div>
+    <div class="bg-info border-white">
+    <div id="excelData" class="text-white"></div>
+    </div>
+    <div class="row my-2">
+        <div class="col">
+            <div class="card bg-info border-white text-center rounded" style="border: 2px solid">
+                <div id="frequencyData"></div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card bg-info border-white text-center rounded" style="border: 2px solid">
+                <div id="cfrequencyData"></div>
+            </div>
+        </div>
+    </div>
     <h2>Simple Bar Graph</h2>
     <svg></svg>
+    <br><br>
     <div id="sortedData"></div>
-
+    <div id="sortingTime"></div>
     <script>
+        var sortingEndTime;
+        var sortingStartTime;
         // URL to the Excel file
         const excelFileURL = 'excel.xlsx';
 
@@ -40,25 +82,28 @@
                         const sheetName = workbook.SheetNames[0];
                         
                         const sheet = workbook.Sheets[sheetName];
+
+                        console.log(sheet);
                         
                         // Convert the sheet data to JSON
                         const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+                        console.log(jsonData);
+                        
                         let ratingAll = [];
 
-                        // Display the Excel data on the webpage
                         const excelDataDiv = document.getElementById('excelData');
                         excelDataDiv.innerHTML = '<table><tr><td><h3>Before Sorting<h3></td></tr>';
                         for (let i = 0; i < jsonData.length; i++) {
                             for (let j = 0; j < jsonData[i].length; j++) {
                                 excelDataDiv.innerHTML += '<tr> <td>' + jsonData[i][j] + '</td> </tr>';
                                 ratingAll.push(jsonData[i][j]);
-                            }
                         }
-                        excelDataDiv.innerHTML += '</table>';
-
-                        sortRating(ratingAll);
-                    };
+                    }
+                    sortingStartTime = performance.now();
+                    console.time("Sorting");
+                    sortRating(ratingAll);
+                };
 
 
                     reader.readAsBinaryString(blob);
@@ -67,16 +112,25 @@
         }
 
         function sortRating(ratingAll) {
-            let i, j, l = 1, u = 5, n = ratingAll.length, D = [], S = [];
+            let i, j, l = 1, u = 5, n = ratingAll.length, D = [], S = [],F=[];
 
             //Initialize Frequencies
             for (i = 0; i < u - l + 1; i++)
                 D[i] = 0;
-
-
             //Compute Frequencies
-            for (i = 0; i < n; i++)
+            for (i = 0; i < n; i++) {
                 D[ratingAll[i] - l] = D[ratingAll[i] - l] + 1;
+
+            }
+
+
+            let freq = '<table style="border: 2px solid white;" width=100%><tr><th>Rating</th><th>Frequency</th></tr>';
+            for (i = l; i <= u; i++) {
+                freq += '<tr><td>' + i + '</td><td>' + D[i - 1] + '</td></tr>';
+                F[i]=D[i-1];
+            }
+            freq += '</table>';
+            document.getElementById('frequencyData').innerHTML = freq;
 
             barGraph(D);
 
@@ -93,6 +147,12 @@
             for (j = 1; j < u - l + 1; j++)
                 D[j] = D[j - 1] + D[j];
 
+            let cFreq = '<table style="border: 2px solid white;" width=100%><tr><th>Rating</th><th>Cummulative Frequency</th></tr>';
+            for (i = l; i <= u; i++) {
+                cFreq += '<tr><td>' + i + '</td><td>' + D[i - 1] + '</td></tr>';
+            }
+            cFreq += '</table>';
+            document.getElementById('cfrequencyData').innerHTML += cFreq;
 
             for (i = n - 1; i >= 0; i--) {
                 j = ratingAll[i] - l
@@ -100,14 +160,21 @@
                 D[j] = D[j] - 1;
             }
 
-            console.log(S);
+            sortingEndTime = performance.now();
+            // Display sorting time in the document
+            const sortingTime = sortingEndTime - sortingStartTime;
+            document.getElementById('sortingTime').textContent = 'Sorting Time: ' + sortingTime + ' milliseconds';
+            console.timeEnd("Sorting");
 
             const sortedData = document.getElementById('sortedData');
-                        sortedData.innerHTML = '<table><tr><td><h3>After Sorting<h3></td></tr>';
+                        sortedData.innerHTML = '<table><tr><td><h3>After Sorting</h3></td></tr>';
                         for (let i = 0; i < S.length; i++) {
                                 sortedData.innerHTML += '<tr> <td>' + S[i] + '</td> </tr>';
                         }
                         sortedData.innerHTML += '</table>';
+                    
+            barGraph(F);
+            
         }
 
         function barGraph(d) {
@@ -129,6 +196,7 @@
                 .attr("y", function (d) { return svgHeight - d })
                 .attr("width", function (d) { return barWidth - barPadding })
                 .attr("height", function (d) { return d })
+                .attr("fill", "#990055")
                 .attr("transform", function (d, i) { return "translate(" + i * barWidth + ",0)" });
 
             let text = svg.selectAll("text")
@@ -139,11 +207,15 @@
                 .attr("y", function (d) { return svgHeight - d - 2 })
                 .attr("x", function (d, i) { return barWidth * i + 10 });
 
+            
+
     }
+                
 
     // Call the function to load and display Excel data
     loadAndDisplayExcelData();
     </script>
+    </div>
 </body>
 
 </html>
